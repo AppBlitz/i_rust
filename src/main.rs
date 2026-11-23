@@ -1,8 +1,8 @@
 use anyhow::Result;
-use utils::system::linux::commands::installation_packages::update_rustup;
+use utils::system::linux::verification_distribution::search_linux_distribution;
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    println!("Status:{:?}", update_rustup("rustup", "update"));
+    println!("{:?}", search_linux_distribution());
     Ok(())
 }
