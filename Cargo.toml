@@ -8,5 +8,4 @@ name = "utils"
 
 [dependencies]
 anyhow = "1.0.104"
-reqwest = "0.13.5"
 tokio = { version = "1.54.1", features = ["full"] }
