@@ -1,3 +1,5 @@
+use std::{env, path::PathBuf};
+
 use anyhow::{Result, anyhow};
 
 use crate::system::{
@@ -55,7 +57,18 @@ fn install_rust_in_linux(information_system: &SystemInformation) {
             ],
         );
     }
-    run_command("rustup", &["component", "add", "rust-analyzer", "rust-src"]);
+    let rustup_bin = env::var("HOME")
+        .map(|home| PathBuf::from(home).join(".cargo/bin/rustup"))
+        .ok()
+        .filter(|path| path.exists())
+        .map(|path| path.to_string_lossy().into_owned())
+        .unwrap_or_else(|| "rustup".to_string());
+
+    println!("Installing rust-analyzer and rust-src...");
+    run_command(
+        &rustup_bin,
+        &["component", "add", "rust-analyzer", "rust-src"],
+    );
 }
 
 fn install_deps_linux(linux_distribution: &LinuxDistro, need_cc: bool, need_curl: bool) {
