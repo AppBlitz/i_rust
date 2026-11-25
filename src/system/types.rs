@@ -21,6 +21,13 @@ pub enum LinuxDistro {
     Unknown,
 }
 
+#[derive(Debug)]
+pub enum CompilatorC {
+    Gcc,
+    Clang,
+    Unknown,
+}
+
 impl From<&str> for LinuxDistro {
     fn from(id: &str) -> Self {
         match id.trim().to_lowercase().as_str() {
