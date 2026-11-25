@@ -1,14 +1,12 @@
 use std::process::Command;
 
-use anyhow::Result;
+use anyhow::{Result, anyhow};
 
-use crate::system::types::CompilatorC;
-
-pub fn verification_compilator_c() -> Result<CompilatorC> {
-    let result = Command::new("gcc").arg("--version").output();
+pub fn verification_compilator_c() -> Result<bool> {
+    let result = Command::new("cc").arg("--version").output();
     match result {
-        Ok(value) if value.status.success() => Ok(CompilatorC::Gcc),
-        _ => Ok(verification_compilator_clang()),
+        Ok(value) if value.status.success() => Ok(value.status.success()),
+        _ => Err(anyhow!("package not found")),
     }
 }
 
@@ -20,7 +18,7 @@ pub fn verificatio_package_installed(package: &str) -> bool {
         .unwrap_or(false)
 }
 
-pub fn install_curl(package_manager: &str, args: &[&str]) -> bool {
+pub fn install_packages(package_manager: &str, args: &[&str]) -> bool {
     Command::new(package_manager)
         .args(args)
         .status()
@@ -28,10 +26,6 @@ pub fn install_curl(package_manager: &str, args: &[&str]) -> bool {
         .unwrap_or(false)
 }
 
-fn verification_compilator_clang() -> CompilatorC {
-    let result = Command::new("clang").arg("--version").output();
-    match result {
-        Ok(value) if value.status.success() => CompilatorC::Clang,
-        _ => CompilatorC::Unknown,
-    }
+pub fn run_command(commands: &str, args: &[&str]) {
+    let _ = Command::new(commands).args(args).status().unwrap();
 }

@@ -1,11 +1,11 @@
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SystemInformation {
     pub os: OperatingSystem,
     pub distro: Option<LinuxDistro>,
     pub architecture: String,
     pub version: String,
 }
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub enum OperatingSystem {
     Linux,
     Windows,
@@ -13,18 +13,11 @@ pub enum OperatingSystem {
     Unknown,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub enum LinuxDistro {
     Ubuntu,
     Arch,
     Fedora,
-    Unknown,
-}
-
-#[derive(Debug)]
-pub enum CompilatorC {
-    Gcc,
-    Clang,
     Unknown,
 }
 
