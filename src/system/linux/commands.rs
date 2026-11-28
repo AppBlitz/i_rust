@@ -29,3 +29,17 @@ pub fn install_packages(package_manager: &str, args: &[&str]) -> bool {
 pub fn run_command(commands: &str, args: &[&str]) {
     let _ = Command::new(commands).args(args).status().unwrap();
 }
+
+pub fn install_tools_of_rust() -> Result<()> {
+    Command::new("rustup")
+        .args(&[
+            "component",
+            "add",
+            "rustfmt",
+            "clippy",
+            "rust-analyzer",
+            "rust-src",
+        ])
+        .status()?;
+    Ok(())
+}

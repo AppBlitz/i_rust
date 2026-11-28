@@ -1,31 +1,13 @@
-use std::{env, path::PathBuf};
-
-use anyhow::{Result, anyhow};
-
 use crate::system::{
-    linux::commands::{
-        install_packages, run_command, verificatio_package_installed, verification_compilator_c,
+    linux::{
+        commands::{
+            install_packages, install_tools_of_rust, run_command, verificatio_package_installed,
+            verification_compilator_c,
+        },
+        verification_distribution::verification_shell,
     },
     types::{LinuxDistro, OperatingSystem, SystemInformation},
 };
-
-pub async fn request_http_for_rustup() -> Result<String> {
-    let response = reqwest::get("https://sh.rustup.rs").await?;
-
-    if !response.status().is_success() {
-        return Err(anyhow!(
-            "
-Error HTTP:{:?}
-",
-            response.status()
-        ));
-    }
-    Ok(response.text().await?)
-}
-pub async fn save_script() -> Result<()> {
-    let _ = std::fs::write("script_rustup.sh", request_http_for_rustup().await?);
-    Ok(())
-}
 
 pub fn install_rust(system_information: SystemInformation) {
     match system_information.os {
@@ -57,30 +39,34 @@ fn install_rust_in_linux(information_system: &SystemInformation) {
             ],
         );
     }
-    let rustup_bin = env::var("HOME")
-        .map(|home| PathBuf::from(home).join(".cargo/bin/rustup"))
-        .ok()
-        .filter(|path| path.exists())
-        .map(|path| path.to_string_lossy().into_owned())
-        .unwrap_or_else(|| "rustup".to_string());
 
+    let _ = verification_shell();
     println!("Installing rust-analyzer and rust-src...");
-    run_command(
-        &rustup_bin,
-        &["component", "add", "rust-analyzer", "rust-src"],
-    );
+    let _ = install_tools_of_rust();
 }
 
 fn install_deps_linux(linux_distribution: &LinuxDistro, need_cc: bool, need_curl: bool) {
     match linux_distribution {
         LinuxDistro::Arch => {
-            let mut args = vec!["pacman", "-S", "--needed", "==neoconfirm"];
+            let mut args = vec!["pacman", "-S", "--needed", "--noconfirm"];
             if need_cc {
-                args.push("gcc");
+                args.push("base-devel");
             }
             if need_curl {
                 args.push("curl");
             }
+            args.extend(["gdb", "lldb", "pkgconf", "binutils"]);
+            install_packages("sudo", &args);
+        }
+        LinuxDistro::Fedora => {
+            let mut args = vec!["dnf", "install"];
+            if need_cc {
+                args.push("base-devel");
+            }
+            if need_curl {
+                args.push("curl");
+            }
+            args.extend(["gdb", "lldb", "pkgconf-pkg-config", "binutils"]);
             install_packages("sudo", &args);
         }
         _ => print!(""),
